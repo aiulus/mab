@@ -2,6 +2,7 @@ from typing import Type
 import numpy as np
 from bandits.base import Bandit
 from algorithms.base import BanditAlgorithm
+from algorithms.etc import ExploreThenCommit
 
 
 class ExperimentRunner:
@@ -51,3 +52,24 @@ class ExperimentRunner:
             "cum_regret": self.cum_regret,
             "actions": self.actions,
         }
+
+
+def run_etc(delta: float, m: int, horizon: int, num_trials: int):
+    regrets = []
+
+    for _ in range(num_trials):
+        means = [0.0, -delta]
+        optimal = max(means)
+
+        algo = ExploreThenCommit(n_arms=2, horizon=horizon, m=m)
+        regret = 0.0
+
+        for t in range(horizon):
+            arm = algo.select_arm(t)
+            reward = np.random.normal(means[arm], 1.0)
+            algo.update(arm, reward)
+            regret += optimal - means[arm]
+
+        regrets.append(regret)
+
+    return np.mean(regrets)
