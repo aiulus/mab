@@ -1,5 +1,3 @@
-# algorithms/ucb.py
-
 import numpy as np
 from algorithms.base import BanditAlgorithm
 

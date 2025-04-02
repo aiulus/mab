@@ -1,5 +1,3 @@
-# bandits/bernoulli.py
-
 import numpy as np
 from bandits.base import Bandit
 
