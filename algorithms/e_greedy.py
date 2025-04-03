@@ -3,10 +3,10 @@ from algorithms.base import BanditAlgorithm
 
 
 class EpsilonGreedy(BanditAlgorithm):
-    def __init__(self, num_arms: int, epsilon_schedule='constant', epsilon_value=0.1):
-        self.num_arms = num_arms
-        self.counts = np.zeros(num_arms, dtype=int)
-        self.values = np.zeros(num_arms)
+    def __init__(self, n_arms: int, epsilon_schedule='constant', epsilon_value=0.1):
+        self.num_arms = n_arms
+        self.counts = np.zeros(n_arms, dtype=int)
+        self.values = np.zeros(n_arms)
         self.t = 0
         self.epsilon_schedule = epsilon_schedule
         self.epsilon_value = epsilon_value

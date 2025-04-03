@@ -2,27 +2,40 @@ import numpy as np
 from algorithms.base import BanditAlgorithm
 
 
-class UCB1(BanditAlgorithm):
-    def __init__(self, n_arms: int):
-        super().__init__(n_arms)
-        self.counts = np.zeros(n_arms)
-        self.values = np.zeros(n_arms)
+class UCB(BanditAlgorithm):
+    """
+    Upper Confidence Bound (UCB) algorithm for stochastic multi-armed bandits.
+    Based on 1-subgaussian rewards and the optimism principle.
 
-    def reset(self):
-        super().reset()
-        self.counts[:] = 0
-        self.values[:] = 0
+    Uses:
+        UCB_i(t) = empirical_mean_i + sqrt(2 * log(1/δ) / n_i)
+    """
+
+    def __init__(self, n_arms: int, horizon: int, delta: float = None):
+        super().__init__(n_arms)
+        self.horizon = horizon
+        self.delta = delta if delta is not None else 1.0 / (horizon ** 2)
+
+        self.counts = np.zeros(n_arms, dtype=int)       # T_i(t)
+        self.means = np.zeros(n_arms)                   # μ̂_i(t)
+        self.ucbs = np.full(n_arms, np.inf)             # UCB_i(t)
 
     def select_arm(self) -> int:
-        self.t += 1
-        if 0 in self.counts:
-            return int(np.argmin(self.counts))  # pull untried arm
-
-        ucb_values = self.values + np.sqrt(2 * np.log(self.t) / self.counts)
-        return int(np.argmax(ucb_values))
+        return int(np.argmax(self.ucbs))
 
     def update(self, arm: int, reward: float):
         self.counts[arm] += 1
-        n = self.counts[arm]
-        value = self.values[arm]
-        self.values[arm] = ((n - 1) / n) * value + (1 / n) * reward
+        alpha = 1.0 / self.counts[arm]
+        self.means[arm] += alpha * (reward - self.means[arm])
+        self.t += 1
+
+        # Update UCBs for all arms
+        for i in range(self.n_arms):
+            if self.counts[i] == 0:
+                self.ucbs[i] = np.inf
+            else:
+                bonus = np.sqrt(2 * np.log(1.0 / self.delta) / self.counts[i])
+                self.ucbs[i] = self.means[i] + bonus
+
+    def name(self):
+        return f"UCB(δ={self.delta:.2e})"
