@@ -1,5 +1,5 @@
 import numpy as np
-from environments.base import Bandit
+from bandits.base import Bandit
 
 
 class GaussianBandit(Bandit):
