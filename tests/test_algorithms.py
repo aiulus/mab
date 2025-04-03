@@ -5,7 +5,7 @@ from algorithms.e_greedy import EpsilonGreedy
 
 def test_etc_behavior():
     etc = ExploreThenCommit(n_arms=2, m=5, horizon=100)
-    for t in range(10):
+    for t in range(11):  # Explore phase is 10 rounds
         arm = etc.select_arm(t)
         etc.update(arm, reward=float(arm))  # deterministic
     assert etc.committed_arm in [0, 1]

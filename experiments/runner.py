@@ -39,7 +39,11 @@ class ExperimentRunner:
         optimal_reward = self.bandit.expected_rewards()[self.bandit.optimal_arm()]
 
         for t in range(self.n_rounds):
-            arm = self.algorithm.select_arm()
+            try:
+                arm = self.algorithm.select_arm(t)  # for algorithms expecting t
+            except TypeError:
+                arm = self.algorithm.select_arm()  # fallback to no-arg version
+
             reward = self.bandit.pull(arm)
             self.algorithm.update(arm, reward)
 
