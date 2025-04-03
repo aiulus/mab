@@ -1,5 +1,5 @@
 # Bandit Algorithms
-This repository implements a suite of Multi-Armed Bandit algorithms. Partially based on [1][bandit-algorithms]
+This repository implements a suite of Multi-Armed Bandit algorithms. Partially based on [1][bandit-algorithms].
 
 
 ## Repository Structure
