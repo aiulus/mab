@@ -1,5 +1,5 @@
 import numpy as np
-from algorithms.base import BanditAlgorithm
+from .base import BanditAlgorithm
 
 
 class UCB(BanditAlgorithm):

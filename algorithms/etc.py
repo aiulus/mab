@@ -1,7 +1,7 @@
 # The Explore-Then-Commit Algorithm
 
 import numpy as np
-from algorithms.base import BanditAlgorithm
+from .base import BanditAlgorithm
 
 
 class ExploreThenCommit(BanditAlgorithm):
