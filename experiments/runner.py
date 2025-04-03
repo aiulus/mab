@@ -3,6 +3,11 @@ import numpy as np
 from bandits.base import Bandit
 from algorithms.base import BanditAlgorithm
 from algorithms.etc import ExploreThenCommit
+from bandits.gaussian import GaussianBandit
+from bandits.bernoulli import BernoulliBandit
+from bandits.linear import LinearBandit
+import matplotlib.pyplot as plt
+import os
 
 
 class ExperimentRunner:
@@ -54,22 +59,43 @@ class ExperimentRunner:
         }
 
 
-def run_etc(delta: float, m: int, horizon: int, num_trials: int):
-    regrets = []
+def create_bandit(env_config: dict) -> Bandit:
+    env_type = env_config["type"].lower()
 
-    for _ in range(num_trials):
-        means = [0.0, -delta]
-        optimal = max(means)
+    if env_type == "gaussian":
+        return GaussianBandit(
+            means=env_config["means"],
+            std=env_config.get("std", 1.0),
+            seed=env_config.get("seed")
+        )
+    elif env_type == "bernoulli":
+        return BernoulliBandit(
+            probs=env_config["probs"],
+            seed=env_config.get("seed")
+        )
+    elif env_type == "linear":
+        return LinearBandit(
+            arms=env_config["arms"],
+            theta=env_config["theta"],
+            noise_std=env_config.get("noise_std", 0.1),
+            seed=env_config.get("seed")
+        )
+    else:
+        raise ValueError(f"Unknown bandit type: {env_type}")
 
-        algo = ExploreThenCommit(n_arms=2, horizon=horizon, m=m)
-        regret = 0.0
 
-        for t in range(horizon):
-            arm = algo.select_arm(t)
-            reward = np.random.normal(means[arm], 1.0)
-            algo.update(arm, reward)
-            regret += optimal - means[arm]
+def plot_regret(cum_regret: np.ndarray, label: str, save_path: str = None):
+    plt.figure(figsize=(8, 5))
+    plt.plot(cum_regret, label=label)
+    plt.xlabel("Rounds")
+    plt.ylabel("Cumulative Regret")
+    plt.title("Bandit Algorithm Performance")
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
 
-        regrets.append(regret)
-
-    return np.mean(regrets)
+    if save_path:
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        plt.savefig(save_path, bbox_inches="tight")
+        print(f"Saved plot to {save_path}")
+    plt.show()
